@@ -1,6 +1,11 @@
 # terrascope
 A dependency scoping tool for Hashicorp Terraform where you can define dependencies between terraform infrastructure code.
 
+***
+Current state of this document is for supporting the development of the tool. User-guide will be written after the tool
+is released publicly.
+***
+
 # Purpose
 The purpose of this tool is to create dependencies between terraform code. Normally one use `terraform modules` in order
  to create re-usable dependencies between the code. In some cases modules can be problematic, like circular dependencies
@@ -106,6 +111,13 @@ Providers will always inherit on sub-directories defined in the `order` list. Yo
 and again in every sub-directory, assuming you will have a scope in each. If there are some `providers` defined in sub-
 directories then it will be overwritten on that specific order and it's childs. 
 
+##### Using different or shared states
+As `providers` will inherit on sub-directories defined in the `order` list, it becomes a problem about states in some 
+scenarios. On those cases, 
+
+* You can define a separate `providers` block on every sub-directory within the `terrascope.yml`file, 
+* You can use the same state defined in parent `backend.conf` that will be inherited into sub-directories,
+
 ### order
 This section defines the running order of the terraform directories. The values can either be a path, URL or a git 
 repository just like in `providers`. All outputs coming from `terraform output` will be feed into 
@@ -121,6 +133,16 @@ overwrite the existing value dynamically injected into `terraform.tfvars` define
 order.
 
 Just like in `providers`, environment variables can be used in `${env}` format. 
+
+##### Using shared variables
+On the case where you use one `terrascope.yml` on the parent directory, all `terraform output`s will be shared among all
+the sub-directories where `terrsacope.yml` lives. Don't forget that the running order will use the inner-most 
+sub-directory first.
+
+This may not be applicable sometimes. You may want to share `terraform output`s while using different `terrascope.yml`
+and different `state`s defined in your `backend.conf`s. `terrascope` will always share `terraform output`s with a parent
+directory, thus you can have different `providers` block on each sub-directory, where `state`s will be isolated but 
+variables will be shared among the whole tree in `<order_name>_<output_name> = <output_value>` format.
 
 # Examples
  TBD
